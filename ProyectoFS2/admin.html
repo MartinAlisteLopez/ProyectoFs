@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- Basic -->
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <!-- Mobile Metas -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <!-- Site Metas -->
+  <meta name="keywords" content="" />
+  <meta name="description" content="" />
+  <meta name="author" content="" />
+
+  <title>Panel de Administración</title>
+
+  <!-- bootstrap core css -->
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+
+  <!-- fonts style -->
+  <link href="https://fonts.googleapis.com/css?family=Poppins:400,700|Roboto:400,700&display=swap" rel="stylesheet">
+  <!-- Custom styles for this template -->
+  <link href="css/style.css" rel="stylesheet" />
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand" href="admin.html">
+        <span>Stroms Solutions - Panel de Administración</span>
+      </a>
+      
+      <div class="ml-auto" id="userMenu">
+        <span class="navbar-text mr-3" id="userName"></span>
+        <button class="btn btn-outline-light btn-sm" id="btnCerrarSesion">
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-4">
+    <ul class="nav nav-tabs" id="adminTabs" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" id="usuarios-tab" data-toggle="tab" href="#usuarios" role="tab">Usuarios</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="productos-tab" data-toggle="tab" href="#productos" role="tab">Productos</a>
+      </li>
+    </ul>
+    
+    <div class="tab-content mt-3" id="adminTabsContent">
+      <!-- Pestaña usuarios -->
+      <div class="tab-pane fade show active" id="usuarios" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h3>Gestión de Usuarios</h3>
+          <button class="btn btn-primary" data-toggle="modal" data-target="#modalCrearUsuario">
+            <i class="bi bi-plus-circle"></i> Crear Usuario
+          </button>
+        </div>
+        
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered" id="tablaUsuarios">
+            <thead class="thead-dark">
+              <tr>
+                <th>RUN</th>
+                <th>Nombre</th>
+                <th>Fecha Nac.</th>
+                <th>Región</th>
+                <th>Comuna</th>
+                <th>Dirección</th>
+                <th>Correo</th>
+                <th>Rol</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Los usuarios se cargarán dinámicamente aquí -->
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- CONTROLES DE PAGINACIÓN USUARIOS -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div>
+                Mostrando <span id="usuariosMostrados">0</span> de <span id="totalUsuarios">0</span> usuarios
+            </div>
+            <div>
+                <button class="btn btn-outline-secondary btn-sm" id="btnUsuariosAnterior" disabled>Anterior</button>
+                <span class="mx-2" id="paginaUsuariosActual">1</span>
+                <button class="btn btn-outline-secondary btn-sm" id="btnUsuariosSiguiente">Siguiente</button>
+            </div>
+            <div>
+                <select class="form-control form-control-sm" id="selectUsuariosPorPagina">
+                    <option value="5">5 por página</option>
+                    <option value="10" selected>10 por página</option>
+                    <option value="20">20 por página</option>
+                    <option value="50">50 por página</option>
+                </select>
+            </div>
+        </div>
+      </div>
+      
+      <!-- Pestaña de Productos -->
+      <div class="tab-pane fade" id="productos" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h3>Gestión de Productos</h3>
+          <button class="btn btn-primary" data-toggle="modal" data-target="#modalCrearProducto">
+            <i class="bi bi-plus-circle"></i> Crear Producto
+          </button>
+        </div>
+        
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered" id="tablaProductos">
+            <thead class="thead-dark">
+              <tr>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Categoría</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Stock Crítico</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Los productos cargan aca -->
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- CONTROLES DE PAGINACIÓN PRODUCTOS -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div>
+                Mostrando <span id="productosMostrados">0</span> de <span id="totalProductos">0</span> productos
+            </div>
+            <div>
+                <button class="btn btn-outline-secondary btn-sm" id="btnProductosAnterior" disabled>Anterior</button>
+                <span class="mx-2" id="paginaProductosActual">1</span>
+                <button class="btn btn-outline-secondary btn-sm" id="btnProductosSiguiente">Siguiente</button>
+            </div>
+            <div>
+                <select class="form-control form-control-sm" id="selectProductosPorPagina">
+                    <option value="5">5 por página</option>
+                    <option value="10" selected>10 por página</option>
+                    <option value="20">20 por página</option>
+                    <option value="50">50 por página</option>
+                </select>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CREAR USUARIO -->
+  <div class="modal fade" id="modalCrearUsuario" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Crear Nuevo Usuario</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formCrearUsuario">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="runAdmin">RUN *</label>
+                            <input type="text" class="form-control" id="runAdmin" placeholder="RUN (sin puntos ni guión)" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="fechaNacimientoAdmin">Fecha de Nacimiento</label>
+                            <input type="date" class="form-control" id="fechaNacimientoAdmin">
+                            <small class="form-text text-muted">Opcional</small>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="nombreAdmin">Nombre *</label>
+                            <input type="text" class="form-control" id="nombreAdmin" placeholder="Nombre" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="apellidosAdmin">Apellidos *</label>
+                            <input type="text" class="form-control" id="apellidosAdmin" placeholder="Apellidos" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="regionAdmin">Región *</label>
+                            <select class="form-control" id="regionAdmin" required>
+                                <option value="">Seleccione una región</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="comunaAdmin">Comuna *</label>
+                            <select class="form-control" id="comunaAdmin" required disabled>
+                                <option value="">Primero seleccione una región</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="direccionAdmin">Dirección *</label>
+                        <input type="text" class="form-control" id="direccionAdmin" placeholder="Dirección completa" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="correoAdmin">Correo electrónico *</label>
+                            <input type="email" class="form-control" id="correoAdmin" placeholder="Correo electrónico" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="rolAdmin">Rol *</label>
+                            <select class="form-control" id="rolAdmin" required>
+                                <option value="cliente">Cliente</option>
+                                <option value="administrador">Administrador</option>
+                                <option value="vendedor">Vendedor</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="contrasenaAdmin">Contraseña *</label>
+                        <input type="password" class="form-control" id="contrasenaAdmin" placeholder="Contraseña" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnGuardarUsuario">Guardar Usuario</button>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- EDITAR USUARIO -->
+  <div class="modal fade" id="modalEditarUsuario" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Usuario</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formEditarUsuario">
+                    <input type="hidden" id="editRun">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="editFechaNacimiento">Fecha de Nacimiento</label>
+                            <input type="date" class="form-control" id="editFechaNacimiento">
+                            <small class="form-text text-muted">Opcional</small>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="editRol">Rol *</label>
+                            <select class="form-control" id="editRol" required>
+                                <option value="cliente">Cliente</option>
+                                <option value="administrador">Administrador</option>
+                                <option value="vendedor">Vendedor</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="editNombre">Nombre *</label>
+                            <input type="text" class="form-control" id="editNombre" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="editApellidos">Apellidos *</label>
+                            <input type="text" class="form-control" id="editApellidos" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="editRegion">Región *</label>
+                            <select class="form-control" id="editRegion" required>
+                                <option value="">Seleccione una región</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="editComuna">Comuna *</label>
+                            <select class="form-control" id="editComuna" required>
+                                <option value="">Seleccione una comuna</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editDireccion">Dirección *</label>
+                        <input type="text" class="form-control" id="editDireccion" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="editCorreo">Correo electrónico *</label>
+                            <input type="email" class="form-control" id="editCorreo" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="editContrasena">Nueva Contraseña</label>
+                            <input type="password" class="form-control" id="editContrasena" placeholder="Dejar vacío para mantener la actual">
+                            <small class="form-text text-muted">Opcional</small>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnActualizarUsuario">Actualizar Usuario</button>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- CREAR PRODUCTO -->
+  <div class="modal fade" id="modalCrearProducto" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Crear Nuevo Producto</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="formCrearProducto" enctype="multipart/form-data">
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="codigoProducto">Código del Producto *</label>
+                <input type="text" class="form-control" id="codigoProducto" required minlength="3">
+                <small class="form-text text-muted">Mínimo 3 caracteres</small>
+              </div>
+              <div class="form-group col-md-6">
+                <label for="categoriaProducto">Categoría *</label>
+                <select class="form-control" id="categoriaProducto" required>
+                  <option value="">Seleccione una categoría</option>
+                  <!-- Las categorias cargan -->
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="nombreProducto">Nombre del Producto *</label>
+              <input type="text" class="form-control" id="nombreProducto" required maxlength="100">
+              <small class="form-text text-muted">Máximo 100 caracteres</small>
+            </div>
+            <div class="form-group">
+              <label for="descripcionProducto">Descripción</label>
+              <textarea class="form-control" id="descripcionProducto" rows="3" maxlength="500"></textarea>
+              <small class="form-text text-muted">Máximo 500 caracteres (opcional)</small>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label for="precioProducto">Precio *</label>
+                <input type="number" class="form-control" id="precioProducto" step="0.01" min="0" required>
+                <small class="form-text text-muted">Valor mínimo: 0 (FREE)</small>
+              </div>
+              <div class="form-group col-md-4">
+                <label for="stockProducto">Stock *</label>
+                <input type="number" class="form-control" id="stockProducto" min="0" required>
+                <small class="form-text text-muted">Valor mínimo: 0</small>
+              </div>
+              <div class="form-group col-md-4">
+                <label for="stockCriticoProducto">Stock Crítico</label>
+                <input type="number" class="form-control" id="stockCriticoProducto" min="0">
+                <small class="form-text text-muted">Valor mínimo: 0 (opcional)</small>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="imagenProducto">Imagen del Producto</label>
+              <input type="file" class="form-control-file" id="imagenProducto" accept="image/*">
+              <small class="form-text text-muted">Formatos: JPG, PNG, GIF (opcional)</small>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="btnGuardarProducto">Guardar Producto</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDITAR PRODUCTO -->
+  <div class="modal fade" id="modalEditarProducto" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar Producto</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="formEditarProducto" enctype="multipart/form-data">
+            <input type="hidden" id="editCodigoProducto">
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="editCategoriaProducto">Categoría *</label>
+                <select class="form-control" id="editCategoriaProducto" required>
+                  <option value="">Seleccione una categoría</option>
+                  <!-- Las categorías se cargarán dinámicamente -->
+                </select>
+              </div>
+              <div class="form-group col-md-6">
+                <label for="editImagenActual">Imagen Actual</label>
+                <div id="editImagenActual" class="text-center">
+                  <!-- La imagen se cargará dinámicamente -->
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="editNombreProducto">Nombre del Producto *</label>
+              <input type="text" class="form-control" id="editNombreProducto" required maxlength="100">
+            </div>
+            <div class="form-group">
+              <label for="editDescripcionProducto">Descripción</label>
+              <textarea class="form-control" id="editDescripcionProducto" rows="3" maxlength="500"></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label for="editPrecioProducto">Precio *</label>
+                <input type="number" class="form-control" id="editPrecioProducto" step="0.01" min="0" required>
+              </div>
+              <div class="form-group col-md-4">
+                <label for="editStockProducto">Stock *</label>
+                <input type="number" class="form-control" id="editStockProducto" min="0" required>
+              </div>
+              <div class="form-group col-md-4">
+                <label for="editStockCriticoProducto">Stock Crítico</label>
+                <input type="number" class="form-control" id="editStockCriticoProducto" min="0">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="editImagenProducto">Nueva Imagen del Producto</label>
+              <input type="file" class="form-control-file" id="editImagenProducto" accept="image/*">
+              <small class="form-text text-muted">Dejar vacío para mantener la imagen actual</small>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="btnActualizarProducto">Actualizar Producto</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
+  <script type="text/javascript" src="js/bootstrap.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
