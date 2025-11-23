@@ -39,7 +39,14 @@ module.exports = function(config) {
       resolve: { extensions: ['.js', '.jsx'] }
     },
     reporters: ['spec', 'coverage'],
-    coverageReporter: { type: 'html', dir: 'coverage/' },
+    coverageReporter: {
+      dir: 'coverage/',
+      reporters: [
+        { type: 'html', subdir: 'Chrome Headless 142.0.0.0 (Windows 10)' },
+        { type: 'lcovonly', subdir: '.', file: 'lcov.info' },
+        { type: 'text-summary' }
+      ]
+    },
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,

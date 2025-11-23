@@ -1,0 +1,10 @@
+node_modules/
+dist/
+coverage/
+*.zip
+.env
+.DS_Store
+/.vscode/
+project-delivery.zip
+ProyectoFS2-delivery.zip
+ProyectoFS2-final.zip
