@@ -75,7 +75,7 @@ export default function SiteHeader() {
                   </li>
                 )}
                 <li className="nav-item">
-                  <Link className="nav-link" to="/products">Productos</Link>
+                  <Link className="nav-link" to="/products">Contratos</Link>
                 </li>
               </ul>
             </div>
