@@ -38,6 +38,20 @@ export const DataStore = {
     writeLS(PRODUCT_KEY, cachedProducts);
     return data;
   },
+  async createProduct(payload) {
+    const { data } = await api.post('/products', payload);
+    await this.fetchProducts();
+    return data;
+  },
+  async updateProduct(id, payload) {
+    const { data } = await api.put(`/products/${id}`, payload);
+    await this.fetchProducts();
+    return data;
+  },
+  async deleteProduct(id) {
+    await api.delete(`/products/${id}`);
+    await this.fetchProducts();
+  },
   listCached() {
     return cachedProducts;
   },
@@ -57,6 +71,21 @@ export const DataStore = {
   },
   get(id) {
     return cachedProducts.find(p => p.id === Number(id));
+  },
+
+  // Órdenes (simple: sin usuario en payload)
+  async createOrder(items) {
+    const body = {
+      items: items.map(it => ({
+        product: { id: it.productId || it.id },
+        quantity: it.qty || 1,
+        price: it.price || 0
+      })),
+      total: items.reduce((sum, it) => sum + (it.price || 0) * (it.qty || 1), 0),
+      status: 'PENDING'
+    };
+    const { data } = await api.post('/orders', body);
+    return data;
   },
 
   // Carrito

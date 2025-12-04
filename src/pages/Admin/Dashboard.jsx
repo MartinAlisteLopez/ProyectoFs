@@ -9,11 +9,12 @@ export default function Dashboard() {
   const nav = useNavigate();
   useEffect(() => {
     const current = AuthStore.current();
-    if (!current || current.rol !== 'administrador') {
+    const roles = current?.roles || [];
+    if (!current || (!roles.includes('ADMIN') && !roles.includes('admin') && !roles.includes('administrador'))) {
       nav('/login');
     }
   }, [nav]);
-  const [products, setProducts] = useState(DataStore.list());
+  const [products, setProducts] = useState([]);
   const [form, setForm] = useState(emptyForm);
   const [filter, setFilter] = useState('');
 
@@ -22,22 +23,31 @@ export default function Dashboard() {
     return products.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()) || p.category.toLowerCase().includes(filter.toLowerCase()));
   }, [products, filter]);
 
-  const saveProduct = (e) => {
+  const loadProducts = async () => {
+    const data = await DataStore.fetchProducts();
+    setProducts(data);
+  };
+
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  const saveProduct = async (e) => {
     e.preventDefault();
     if (form.id) {
-      DataStore.update(form.id, { ...form, price: Number(form.price), stock: Number(form.stock) });
+      await DataStore.updateProduct(form.id, { ...form, price: Number(form.price), stock: Number(form.stock) });
     } else {
-      DataStore.create({ ...form, price: Number(form.price), stock: Number(form.stock) });
+      await DataStore.createProduct({ ...form, price: Number(form.price), stock: Number(form.stock) });
     }
-    setProducts(DataStore.list());
+    await loadProducts();
     setForm(emptyForm);
   };
 
   const editProduct = (p) => setForm(p);
 
-  const deleteProduct = (id) => {
-    DataStore.remove(id);
-    setProducts(DataStore.list());
+  const deleteProduct = async (id) => {
+    await DataStore.deleteProduct(id);
+    await loadProducts();
     if (form.id === id) setForm(emptyForm);
   };
 

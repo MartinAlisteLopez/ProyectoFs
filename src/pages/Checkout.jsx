@@ -23,8 +23,16 @@ export default function Checkout() {
     const hasItems = DataStore.cartList().length > 0;
     if (!hasItems) return nav('/failure', { state: { reason: 'No hay productos en el carrito.' } });
 
-    DataStore.cartClear();
-    nav('/success', { state: { ...form } });
+    try {
+      await DataStore.createOrder(DataStore.cartList().map(line => {
+        const p = products.find(x => x.id === line.productId);
+        return { ...p, qty: line.qty };
+      }));
+      DataStore.cartClear();
+      nav('/success', { state: { ...form } });
+    } catch (err) {
+      nav('/failure', { state: { reason: 'No se pudo enviar la orden.' } });
+    }
   };
 
   return (
