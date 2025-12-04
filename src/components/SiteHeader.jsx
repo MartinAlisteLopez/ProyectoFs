@@ -33,7 +33,7 @@ export default function SiteHeader() {
 
           {user && (
             <div className="ml-auto d-none d-lg-block" id="userMenu">
-              <span className="navbar-text mr-3" id="userName">Hola, {user.nombre}</span>
+              <span className="navbar-text mr-3" id="userName">Hola, {user.nombre || user.email}</span>
               <button className="btn btn-outline-light btn-sm" id="btnCerrarSesion" onClick={handleLogout}>
                 Cerrar Sesión
               </button>

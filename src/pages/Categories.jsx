@@ -1,11 +1,15 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { DataStore } from '../data.store.js';
 import ProductCard from '../components/ProductCard.jsx';
 import PageShell from '../components/PageShell.jsx';
 
 export default function Categories() {
   const [query, setQuery] = useState('');
-  const products = useMemo(() => DataStore.list(), []);
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    DataStore.fetchProducts().then(setProducts).catch(() => setProducts(DataStore.listCached()));
+  }, []);
 
   const filtered = useMemo(() => {
     if (!query) return products;

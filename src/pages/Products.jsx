@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SiteHeader from '../components/SiteHeader.jsx';
 import InfoSection from '../components/InfoSection.jsx';
@@ -7,8 +7,14 @@ import { DataStore } from '../data.store.js';
 import { QuoteStore } from '../quote.store.js';
 
 export default function Products() {
-  const items = useMemo(() => DataStore.list(), []);
+  const [items, setItems] = useState([]);
   const nav = useNavigate();
+
+  useEffect(() => {
+    DataStore.fetchProducts()
+      .then(setItems)
+      .catch(() => setItems(DataStore.listCached()));
+  }, []);
 
   const contratar = (product) => {
     QuoteStore.setItems([{ ...product, qty: 1 }]);

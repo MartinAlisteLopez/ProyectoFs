@@ -1,10 +1,16 @@
-import { useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { DataStore } from '../data.store.js';
 import ProductCard from '../components/ProductCard.jsx';
 import PageShell from '../components/PageShell.jsx';
 
 export default function Offers() {
-  const items = useMemo(() => DataStore.listOffers(), []);
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    DataStore.fetchProducts()
+      .then(() => setItems(DataStore.listOffers()))
+      .catch(() => setItems(DataStore.listOffers()));
+  }, []);
 
   const handleAdd = (p) => {
     DataStore.cartAdd(p.id, 1);

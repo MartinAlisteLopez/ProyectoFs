@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DataStore } from '../data.store.js';
 import PageShell from '../components/PageShell.jsx';
@@ -8,6 +8,13 @@ export default function Checkout() {
   const [form, setForm] = useState({
     name: '', email: '', address: '', city: '', delivery: 'standard'
   });
+  const [products, setProducts] = useState(DataStore.listCached());
+
+  useEffect(() => {
+    DataStore.fetchProducts()
+      .then(setProducts)
+      .catch(() => setProducts(DataStore.listCached()));
+  }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -63,10 +70,10 @@ export default function Checkout() {
               <div className="card-body">
                 <h6 className="card-title">Resumen</h6>
                 <ul className="list-unstyled mb-0">
-                  {DataStore.cartList().map(line => {
-                    const p = DataStore.get(line.productId);
-                    return <li key={line.productId}>{line.qty}x {p?.name}</li>;
-                  })}
+                {DataStore.cartList().map(line => {
+                  const p = products.find(x => x.id === line.productId);
+                  return <li key={line.productId}>{line.qty}x {p?.name}</li>;
+                })}
                 </ul>
               </div>
             </div>

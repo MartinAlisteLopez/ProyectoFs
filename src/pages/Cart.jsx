@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DataStore } from '../data.store.js';
 import PageShell from '../components/PageShell.jsx';
@@ -6,7 +6,13 @@ import PageShell from '../components/PageShell.jsx';
 export default function Cart() {
   const [, force] = useState(0); // trigger re-render
   const cart = DataStore.cartList();
-  const products = DataStore.list();
+  const [products, setProducts] = useState(DataStore.listCached());
+
+  useEffect(() => {
+    DataStore.fetchProducts()
+      .then(setProducts)
+      .catch(() => setProducts(DataStore.listCached()));
+  }, []);
 
   const rows = useMemo(() => cart.map(line => {
     const product = products.find(p => p.id === line.productId);

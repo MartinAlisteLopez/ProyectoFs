@@ -1,16 +1,11 @@
 /**
- * Fuente de datos simulada con persistencia en localStorage.
+ * Fuente de datos híbrida: cache local + fetch API (axios).
  * Maneja catálogo de productos y carrito.
  */
-const PRODUCT_KEY = 'stroms-products-v1';
-const CART_KEY = 'stroms-cart-v1';
+import api from './api.js';
 
-const seedProducts = [
-  { id: 1, name: 'Kit instalación básica', category: 'Instalaciones', price: 49990, onSale: true, stock: 10, description: 'Instalación eléctrica residencial estándar.', image: '/images/s-1.jpg' },
-  { id: 2, name: 'Cableado en tubos', category: 'Cableado', price: 89990, onSale: false, stock: 8, description: 'Cableado seguro para oficinas y locales.', image: '/images/s-2.jpg' },
-  { id: 3, name: 'Reparación electrodomésticos', category: 'Reparaciones', price: 29990, onSale: true, stock: 25, description: 'Diagnóstico y reparación rápida.', image: '/images/s-3.jpg' },
-  { id: 4, name: 'Panel solar residencial', category: 'Paneles Solares', price: 249990, onSale: false, stock: 5, description: 'Instalación y mantenimiento de paneles solares.', image: '/images/solar-panel.png' }
-];
+const PRODUCT_KEY = 'stroms-products-cache';
+const CART_KEY = 'stroms-cart-v1';
 
 function readLS(key, fallback) {
   try {
@@ -27,10 +22,8 @@ function writeLS(key, value) {
 }
 
 // inicialización
-if (!readLS(PRODUCT_KEY, null)) writeLS(PRODUCT_KEY, seedProducts);
 if (!readLS(CART_KEY, null)) writeLS(CART_KEY, []);
-
-const nextId = (items) => (items.length ? Math.max(...items.map(p => p.id)) + 1 : 1);
+let cachedProducts = readLS(PRODUCT_KEY, []);
 const notifyCart = () => {
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent('cart:updated'));
@@ -38,45 +31,32 @@ const notifyCart = () => {
 };
 
 export const DataStore = {
-  // CRUD productos
-  list() {
-    return readLS(PRODUCT_KEY, []);
+  // Productos
+  async fetchProducts() {
+    const { data } = await api.get('/products');
+    cachedProducts = data;
+    writeLS(PRODUCT_KEY, cachedProducts);
+    return data;
+  },
+  listCached() {
+    return cachedProducts;
   },
   listByCategory(category) {
-    return this.list().filter(p => p.category === category);
+    return cachedProducts.filter(p => p.category === category);
   },
   listOffers() {
-    return this.list().filter(p => p.onSale);
+    return cachedProducts.filter(p => p.onSale);
   },
   search(term) {
     const q = (term || '').toLowerCase();
-    return this.list().filter(p =>
-      p.name.toLowerCase().includes(q) ||
-      p.category.toLowerCase().includes(q) ||
+    return cachedProducts.filter(p =>
+      (p.name || '').toLowerCase().includes(q) ||
+      (p.category || '').toLowerCase().includes(q) ||
       (p.description || '').toLowerCase().includes(q)
     );
   },
   get(id) {
-    return this.list().find(p => p.id === Number(id));
-  },
-  create(product) {
-    const items = this.list();
-    const productToInsert = { id: nextId(items), stock: 0, onSale: false, ...product };
-    writeLS(PRODUCT_KEY, [...items, productToInsert]);
-    return productToInsert;
-  },
-  update(id, changes) {
-    const items = this.list();
-    const idx = items.findIndex(p => p.id === Number(id));
-    if (idx === -1) return null;
-    const updated = { ...items[idx], ...changes };
-    items[idx] = updated;
-    writeLS(PRODUCT_KEY, items);
-    return updated;
-  },
-  remove(id) {
-    const updated = this.list().filter(p => p.id !== Number(id));
-    writeLS(PRODUCT_KEY, updated);
+    return cachedProducts.find(p => p.id === Number(id));
   },
 
   // Carrito
