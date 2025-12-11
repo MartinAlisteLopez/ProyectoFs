@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { AuthStore } from './auth.store.js';
 
 // API USUARIOS
 export const userApi = axios.create({

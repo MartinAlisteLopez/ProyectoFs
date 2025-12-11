@@ -10,12 +10,22 @@ export default function Login() {
   const [form, setForm] = useState({ correo: '', contrasena: '' });
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(''); // limpiar errores antes de intentar login
     try {
-      const user = AuthStore.login(form.correo.trim(), form.contrasena);
-      setError('');
-      nav(user.rol === 'administrador' ? '/admin' : '/');
+      const user = await AuthStore.login(form.correo.trim(), form.contrasena); 
+
+      // obtener rol de localStorage/AuthStore
+      const rol = AuthStore.getRol();
+
+      // redireccion basada en el rol
+      if (rol === 'ADMIN') {
+        nav('/admin');
+      } else {
+        nav('/');
+      }
+
     } catch (err) {
       setError(err.message);
     }
