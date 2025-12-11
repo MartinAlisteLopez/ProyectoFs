@@ -1,16 +1,18 @@
 import axios from 'axios';
 import { AuthStore } from './auth.store.js';
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1'
+// API USUARIOS
+export const userApi = axios.create({
+    baseURL: import.meta.env.VITE_USERS_API_URL || 'http://34.198.83.45:8081/api/v1/usuarios',
 });
 
-api.interceptors.request.use((config) => {
-  const token = AuthStore.getToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
+// API PRODUCTOS
+export const productApi = axios.create({
+    baseURL: import.meta.env.VITE_PRODUCTS_API_URL || 'http://34.198.83.45:8082/api/v1/productos',
 });
 
-export default api;
+// API CARRITO
+export const cartApi = axios.create({
+    baseURL: import.meta.env.VITE_CARTS_API_URL || 'http://34.198.83.45:8084/api/v1/carrito',
+});
+
