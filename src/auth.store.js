@@ -8,6 +8,7 @@ const SESSION_KEY = 'usuarioActual';
 const ROL_KEY = 'user_rol'; 
 const USERNAME_KEY = 'username'; 
 const TOKEN_KEY = 'auth_token'; 
+const ID_KEY = 'user_id';
 
 
 // llama al back para obtener el rol y almacena la sesión
@@ -54,13 +55,18 @@ export const AuthStore = {
 
     async login(username, contrasena) {
         
-        // 1. verificar credenciales
+        // 1. Verificar credenciales y obtener token
         try {
-            await userApi.post('/login', { username, contrasena }); 
+            const { data } = await userApi.post('/login', { username, contrasena });
+            const idUsuario = data.idUsuario; 
+            localStorage.setItem(ID_KEY, idUsuario); // guardar id del usuario  
         } catch (error) {
-            console.error("Login fallido:", error);
-            AuthStore.logout(); // limpia cualquier sesión anterior
-            throw new Error("Credenciales inválidas o error de conexión."); 
+            if (error.response && error.response.status === 401) {
+                // error 401 del back x credenciales:
+                throw new Error("Credenciales inválidas. Por favor, revisa tu correo y contraseña.");
+            }
+            // error de conexion o cualquier otro
+            throw new Error(error.message || "Error al conectar con el servidor de autenticación.");
         }
 
         // 2. Obtener y almacenar el rol del usuario
@@ -69,7 +75,8 @@ export const AuthStore = {
         // 3. Almacenar token simulado
         const current = { 
             username: username, 
-            roles: [rol] 
+            roles: [rol],
+            id: idUsuario
         };
         
         sessionStorage.setItem(SESSION_KEY, JSON.stringify(current)); 
@@ -84,8 +91,12 @@ export const AuthStore = {
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem(USERNAME_KEY); 
         localStorage.removeItem(ROL_KEY);
+        localStorage.removeItem(ID_KEY);
     },
     
+    getId() {
+        return localStorage.getItem(ID_KEY);
+    },
 
     // current devuelve el usuario actual o null si no hay sesión
     current() {

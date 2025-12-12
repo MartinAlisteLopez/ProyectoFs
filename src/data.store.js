@@ -1,5 +1,6 @@
 
 import { productApi, cartApi, userApi } from './api.js';
+import { AuthStore } from './auth.store.js';
 
 const PRODUCT_KEY = 'stroms-products-cache';
 const CART_KEY = 'stroms-cart-v1';
@@ -73,27 +74,37 @@ export const DataStore = {
   // Ordenes (llama al microservicio de carrito)
   async createOrder(items) {
 
-    const user = AuthStore.current();
-    if (!user) throw new Error("Debe iniciar sesión para finalizar la compra.");
+    const idUsuario = AuthStore.getId(); // obtener id del usuario actual
+    
+    if (!idUsuario) throw new Error("Debe iniciar sesión para finalizar la compra.");
 
     const body = {
-        idUsuario: idUsuario, // usammos id temporal por ahora
-        fechaCreacion: new Date().toISOString().slice(0, 10), // (YYYY-MM-DD)
+
+      idUsuario: Number(idUsuario), // convertimos a numero pq el backend espera int
+      fechaCreacion: new Date().toISOString().slice(0, 10), // (YYYY-MM-DD)
         
-        items: items.map(it => ({
-            idProducto: it.productId || it.id, // Mapea a idProducto
-            cantidad: it.qty || 1, // Mapea a cantidad
-            precioUnitario: it.price || 0 // Mapea a precioUnitario
-        })),
+      items: items.map(it => ({
+        idProducto: it.productId || it.id, // Mapea a idProducto
+        cantidad: it.qty || 1, // Mapea a cantidad
+        precioUnitario: it.price || 0 // Mapea a precioUnitario
+      })),
+
     };
 
+    // se ejecuta la creacion del carrito
     const carritoCreado = await cartApi.post('/add', body);
-    const idCarrito = carritoCreado.data.idCarrito; // obtener id q el backend asignó
 
-    // llama al endpoint de finalizar compra
-    const { data } = await cartApi.post(`/comprar/${idCarrito}`); // Endpoint de Carrito
+    // el backend devuelve el id del carrito creado
+    const idCarrito = carritoCreado.data.idCarrito;
+
+    // finaliza la compra llamando al endpoint correspondiente
+    const { data } = await cartApi.post(`/comprar/${idCarrito}`);
+
+    // limpia el carrito localmente despues de comprar exitosamente
+    this.cartClear();
 
     return data;
+
   },
 
   // Carrito
