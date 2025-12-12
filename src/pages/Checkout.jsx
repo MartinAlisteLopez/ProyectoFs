@@ -18,7 +18,7 @@ export default function Checkout() {
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const hasItems = DataStore.cartList().length > 0;
     if (!hasItems) return nav('/failure', { state: { reason: 'No hay productos en el carrito.' } });
@@ -28,7 +28,6 @@ export default function Checkout() {
         const p = products.find(x => x.id === line.productId);
         return { ...p, qty: line.qty };
       }));
-      DataStore.cartClear();
       nav('/success', { state: { ...form } });
     } catch (err) {
       nav('/failure', { state: { reason: 'No se pudo enviar la orden.' } });
