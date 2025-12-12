@@ -69,7 +69,7 @@ export default function SiteHeader() {
                     </li>
                   </>
                 )}
-                {user && user.rol === 'administrador' && (
+                {user && AuthStore.isAdmin() && (
                   <li className="nav-item">
                     <Link className="nav-link" to="/admin">Administrador</Link>
                   </li>

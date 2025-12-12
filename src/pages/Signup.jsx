@@ -15,15 +15,28 @@ export default function Signup() {
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(''); // limpiar errores previos
+
+    // mapear campos del formulario a los campos del backend
+    const payload = {
+        nombre: `${form.nombre} ${form.apellidos}`,
+        correo: form.correo,
+        contrasena: form.contrasena,
+        // OJO AQUI EN CASO DE CORRECCIONES FUTURAS
+        direccion: `${form.region}, ${form.comuna}, ${form.direccion}`,
+    };
+
     try {
-      AuthStore.register(form);
+      await AuthStore.register(payload); 
       setError('');
       nav('/login');
     } catch (err) {
-      setError(err.message);
+      const errorMessage = err.response?.data?.message || err.message || 'Error al crear la cuenta. Inténtalo de nuevo.';
+      setError(errorMessage);
     }
+
   };
 
   const comunas = form.region ? regionesYComunas[form.region] || [] : [];

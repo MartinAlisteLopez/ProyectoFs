@@ -1,8 +1,5 @@
-/**
- * Fuente de datos híbrida: cache local + fetch API (axios).
- * Maneja catálogo de productos y carrito.
- */
-import api from './api.js';
+
+import { productApi, cartApi, userApi } from './api.js';
 
 const PRODUCT_KEY = 'stroms-products-cache';
 const CART_KEY = 'stroms-cart-v1';
@@ -33,23 +30,23 @@ const notifyCart = () => {
 export const DataStore = {
   // Productos
   async fetchProducts() {
-    const { data } = await api.get('/products');
+    const { data } = await productApi.get('/all'); 
     cachedProducts = data;
     writeLS(PRODUCT_KEY, cachedProducts);
     return data;
   },
   async createProduct(payload) {
-    const { data } = await api.post('/products', payload);
+    const { data } = await productApi.post('/add', payload);
     await this.fetchProducts();
     return data;
   },
   async updateProduct(id, payload) {
-    const { data } = await api.put(`/products/${id}`, payload);
+    const { data } = await productApi.put(`/update?id=${id}`, payload);
     await this.fetchProducts();
     return data;
   },
   async deleteProduct(id) {
-    await api.delete(`/products/${id}`);
+    await productApi.delete(`/delete?id=${id}`);
     await this.fetchProducts();
   },
   listCached() {
@@ -73,18 +70,29 @@ export const DataStore = {
     return cachedProducts.find(p => p.id === Number(id));
   },
 
-  // Órdenes (simple: sin usuario en payload)
+  // Ordenes (llama al microservicio de carrito)
   async createOrder(items) {
+
+    const user = AuthStore.current();
+    if (!user) throw new Error("Debe iniciar sesión para finalizar la compra.");
+
     const body = {
-      items: items.map(it => ({
-        product: { id: it.productId || it.id },
-        quantity: it.qty || 1,
-        price: it.price || 0
-      })),
-      total: items.reduce((sum, it) => sum + (it.price || 0) * (it.qty || 1), 0),
-      status: 'PENDING'
+        idUsuario: idUsuario, // usammos id temporal por ahora
+        fechaCreacion: new Date().toISOString().slice(0, 10), // (YYYY-MM-DD)
+        
+        items: items.map(it => ({
+            idProducto: it.productId || it.id, // Mapea a idProducto
+            cantidad: it.qty || 1, // Mapea a cantidad
+            precioUnitario: it.price || 0 // Mapea a precioUnitario
+        })),
     };
-    const { data } = await api.post('/orders', body);
+
+    const carritoCreado = await cartApi.post('/add', body);
+    const idCarrito = carritoCreado.data.idCarrito; // obtener id q el backend asignó
+
+    // llama al endpoint de finalizar compra
+    const { data } = await cartApi.post(`/comprar/${idCarrito}`); // Endpoint de Carrito
+
     return data;
   },
 
