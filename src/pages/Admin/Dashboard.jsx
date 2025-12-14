@@ -8,9 +8,7 @@ const emptyForm = { id: null, name: '', category: '', price: 0, stock: 0, onSale
 export default function Dashboard() {
   const nav = useNavigate();
   useEffect(() => {
-    const current = AuthStore.current();
-    const roles = current?.roles || [];
-    if (!current || (!roles.includes('ADMIN') && !roles.includes('admin') && !roles.includes('administrador'))) {
+    if (!AuthStore.isLoggedIn() || !AuthStore.isAdmin()) {
       nav('/login');
     }
   }, [nav]);
