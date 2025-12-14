@@ -55,7 +55,7 @@ export default function Signup() {
           <div className="row">
             <div className="col-md-8 mx-auto">
               {error && <div className="alert alert-danger">{error}</div>}
-              <form id="formularioRegistro" onSubmit={handleSubmit}>
+              <form id="formularioRegistro" className="signup-form" onSubmit={handleSubmit}>
                 <div className="form-row">
                   <div className="form-group col-md-6">
                     <input type="text" id="run" name="run" placeholder="RUN" required value={form.run} onChange={handleChange} />
