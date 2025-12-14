@@ -51,13 +51,16 @@ export default function SiteHeader() {
                   <Link className="nav-link" to="/">Inicio</Link>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link" href="/#about">Nosotros</a>
+                  <Link className="nav-link" to="/about">Nosotros</Link>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link" href="/#services">Servicios</a>
+                  <Link className="nav-link" to="/services">Servicios</Link>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link" href="/#contact">Contacto</a>
+                  <Link className="nav-link" to="/contact">Contacto</Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/blogs">Blogs</Link>
                 </li>
                 {!user && (
                   <>
